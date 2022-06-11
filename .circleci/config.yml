@@ -3,36 +3,42 @@ orbs:
   slack: circleci/slack@4.10.1
 
 commands:
-  destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-    parameters:
-      # Add parameter here   
+  notify_on_failure:
     steps:
-      - run:
-          name: Destroy environments
-          when: on_fail
-          command: |
-            # Your code here
-            exit 1
+      - slack/notify:
+        event: fail
+        channel: project3
+        template: basic_fail_1
+  # destroy-environment:
+  #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+  #   parameters:
+  #     # Add parameter here   
+  #   steps:
+  #     - run:
+  #         name: Destroy environments
+  #         when: on_fail
+  #         command: |
+  #           # Your code here
+  #           exit 1
 
-  revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      # Add parameter here     
-    steps:
-      - run:
-          name: Revert migrations
-          # Add when this will run
-          command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
-            if(( $SUCCESS==1 )); 
-            then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
-            fi
+  # revert-migrations:
+  #   description: Revert the last migration if successfully run in the current workflow.
+  #   parameters:
+  #     # Add parameter here     
+  #   steps:
+  #     - run:
+  #         name: Revert migrations
+  #         # Add when this will run
+  #         command: |
+  #           # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+  #           SUCCESS = 1
+  #           if(( $SUCCESS==1 )); 
+  #           then
+  #           #  cd ~/project/backend
+  #           #  npm install
+  #           #  Add revert code here. You can find this in the Getting Started section.
+  #             exit 1
+  #           fi
             
 jobs:
   build-frontend:
@@ -52,6 +58,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - notify_on_failure
 
   build-backend:
     docker:
@@ -70,6 +77,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - notify_on_failure
 
   test-frontend:
     docker:
@@ -86,6 +94,7 @@ jobs:
             npm install
             npm run test
             #exit 2
+      - notify_on_failure
                 
   test-backend:
     docker:
@@ -102,6 +111,7 @@ jobs:
             npm install
             npm run test
             #exit 2
+      - notify_on_failure
             
   scan-frontend:
     docker:
@@ -119,6 +129,7 @@ jobs:
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical
             #exit 2
+      - notify_on_failure
 
   scan-backend:
     docker:
@@ -135,6 +146,15 @@ jobs:
             npm install
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical
+      - notify_on_failure
+  notify_on_success:
+    docker:
+      - image: circleci/base:stable
+    steps:
+      - slack/notify:
+          event: pass
+          channel: project3
+          template: success_tagged_deployment_1
 
 #   deploy-infrastructure:
 #     docker:
@@ -299,8 +319,7 @@ jobs:
 #             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
 #             then
 #               # your code here
-#             fi
-            
+#             fi  
 
 workflows:
   default:
@@ -315,6 +334,9 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - notify_on_success:
+          requires:
+            - "" #all the previous
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
