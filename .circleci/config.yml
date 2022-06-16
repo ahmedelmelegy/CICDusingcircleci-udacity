@@ -11,6 +11,7 @@ commands:
           template: basic_fail_1
 
   install_awscli:
+    description: install AWS cli v2
     steps:
       - run:
           name: install aws cli v2
@@ -20,6 +21,7 @@ commands:
             sudo ./aws/install
   
     install_ansible:
+    description: install ansible
     steps:
       - run:
           name: install ansible
