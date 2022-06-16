@@ -9,15 +9,37 @@ commands:
           event: fail
           channel: project3
           template: basic_fail_1
-  # destroy-environment:
-  #   description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
-  #   steps:
-  #     - run:
-  #         name: Destroy environments
-  #         when: on_fail
-  #         command: |
-  #           aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
-  #           #exit 1
+
+  install_awscli:
+    description: install AWS cli v2
+    steps:
+      - run:
+          name: install aws cli v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+  
+    install_ansible:
+    description: install ansible
+    steps:
+      - run:
+          name: install ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible
+
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:7}
+            #exit 1
 
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
@@ -177,37 +199,38 @@ jobs:
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
               #exit 1
-      # - run:
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       aws ec2 describe-instances \
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --output text >> inventory
-      #       #exit 1
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
-      #- destroy-environment      
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text >> inventory
+            #exit 1
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - destroy-environment      
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure      
+  # configure-infrastructure:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["f7:af:9a:9f:aa:b0:ca:08:ad:9d:c6:6c:9a:b5:7a:16"]
+  #     # attach workspace
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           # Your code here
+  #           exit 1
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           ansible-playbook -i inventory.txt configure-server.yml deploy-backend.yml
+  #     - destroy-environment    
 
 #   run-migrations:
 #     docker:
@@ -340,7 +363,7 @@ workflows:
           #requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
       #       branches:
-      #         only: [test-feature-branch]
+      #         only: [master]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
