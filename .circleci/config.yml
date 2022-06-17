@@ -232,6 +232,8 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints: ["f7:af:9a:9f:aa:b0:ca:08:ad:9d:c6:6c:9a:b5:7a:16"]
+      - install_awscli
+      - install_ansible
       - attach_workspace:
           at: ~/
       # - run:
@@ -243,8 +245,6 @@ jobs:
           name: Configure server
           command: |
             ansible-playbook -i inventory.txt configure-server.yml
-      - install_awscli
-      - install_ansible
       - destroy-environment    
 
 #   run-migrations:
