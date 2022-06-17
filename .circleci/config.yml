@@ -358,6 +358,7 @@ jobs:
       - run:
           name: Package backend
           command: |
+            mkdir backend/dist
             cd backend/dist
             cp ../package* .
             zip -rq dist.zip *
