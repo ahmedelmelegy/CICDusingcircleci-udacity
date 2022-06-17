@@ -51,7 +51,7 @@ commands:
           command: |   
             sudo apt-get update  
             sudo apt-get upgrade
-            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -     
+            curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -     
             sudo apt-get install -y nodejs
             sudo apt-get install gcc g++ make
 
@@ -329,6 +329,7 @@ jobs:
           command: |
             cd frontend
             npm run build
+            tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment   
       - revert-migrations       
