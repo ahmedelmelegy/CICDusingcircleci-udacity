@@ -334,22 +334,50 @@ jobs:
       - destroy-environment   
       - revert-migrations       
                     
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+      - install_nodejs
+      # - install_gzip
+      - add_ssh_keys:
+          fingerprints: ["f7:af:9a:9f:aa:b0:ca:08:ad:9d:c6:6c:9a:b5:7a:16"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys:
+            - backend-build
+      - run:
+          name: install dependencies
+          command: |
+            cd backend
+            npm install
+      - run:
+          name: package backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
+            #tar -C backend -czvf artifact.tar.gz .
+            cd ..
+            # Zip the directory
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+          name: Deploy backend
+          command: |
+            export TYPEORM_MIGRATIONS_DIR=/migrations
+            export TYPEORM_ENTITIES=/modules/domain/**/*.entity.ts
+            export TYPEORM_MIGRATIONS=/migrations/*.ts
+            
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment   
+      - revert-migrations   
 
 #   smoke-test:
 #     docker:
@@ -432,8 +460,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
