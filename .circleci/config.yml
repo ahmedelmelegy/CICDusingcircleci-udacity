@@ -44,12 +44,14 @@ commands:
             sudo apt install python3.8 -y
 
   install_nodejs:
-    description: nodejs
+    description: install nodejs
     steps:
       - run:
-          name: nodejs
-          command: |     
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -     
+          name: install nodejs
+          command: |   
+            sudo apt update  
+            sudo apt upgrade
+            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -     
             sudo apt install -y node.js
 
   install_gzip:
