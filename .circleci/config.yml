@@ -49,10 +49,11 @@ commands:
       - run:
           name: install nodejs
           command: |   
-            sudo apt update  
-            sudo apt upgrade
+            sudo apt-get update  
+            sudo apt-get upgrade
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -     
-            sudo apt install -y node.js
+            sudo apt-get install -y nodejs
+            sudo apt-get install gcc g++ make
 
   install_gzip:
     description: Install gzip
