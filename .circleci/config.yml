@@ -237,8 +237,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            sudo apt update
-            sudo apt-get -y install gzip
+            apt update
+            apt-get -y install gzip
       - run:
           name: Configure server
           command: |
@@ -372,13 +372,13 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      - deploy-infrastructure
+      # - deploy-infrastructure
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           # filters:
           #   branches:
           #     only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      - configure-infrastructure
+          # requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
