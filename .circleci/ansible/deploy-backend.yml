@@ -1,6 +1,5 @@
 ---
-
-- name: "configuration play." 
+- name: "deployment play." 
   hosts: web
   remote_user: ubuntu
   become: true
@@ -33,6 +32,7 @@
       become: true
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
+
     - setup:
   roles:
     - deploy
