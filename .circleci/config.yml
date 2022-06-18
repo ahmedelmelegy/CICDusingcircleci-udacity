@@ -357,22 +357,27 @@ jobs:
           command: |
             cd backend
             npm install
-      - run:
-          name: Package backend
-          command: |
-            cd backend
-            npm run build
-            tar -czf artifact.tar.gz dist/* package*
+      # - run:
+      #     name: Package backend
+      #     command: |
+      #       cd backend
+      #       npm run build
+      #       tar -czf artifact.tar.gz dist/* package*
 
-            cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      #       cd ..
+      #       cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
 
       - run:
           name: Deploy backend
           command: |
+            cd backend
+            npm i
+            npm run build
             export TYPEORM_MIGRATIONS_DIR=/migrations
             export TYPEORM_ENTITIES=/modules/domain/**/*.entity.ts
             export TYPEORM_MIGRATIONS=/migrations/*.ts
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -vvv -i inventory.txt deploy-backend.yml
