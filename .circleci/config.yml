@@ -83,7 +83,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = $(curl --insecure https://kvdb.io/SvLxGMs7JBktRwPCCZNx1i/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS = $(curl --insecure https://kvdb.io/3tz7ZG7asBAMMarn5bwZFW/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -290,7 +290,7 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-              curl https://kvdb.io/SvLxGMs7JBktRwPCCZNx1i/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/3tz7ZG7asBAMMarn5bwZFW/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
      # Here's where you will add some code to rollback on failure  
       - destroy-environment   
@@ -350,24 +350,25 @@ jobs:
       - restore_cache:
           keys:
             - backend-build
-      - run:
-          name: install dependencies
-          command: |
-            cd backend
-            npm install
-
-      - run:
-          name: Deploy backend
-          command: |
-            cd backend
-            npm i
-            npm run build
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd .circleci/ansible
-            echo "Contents  of the inventory.txt file is -------"
-            cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml
+        environment:
+            ANSIBLE_HOST_KEY_CHECKING: "no"
+        steps:
+            - checkout
+            - run:
+                name: Install dependencies
+                command: |
+                  apk add --update tar gzip curl nodejs npm ansible zip
+                  pip install awscli
+            - attach_workspace:
+                at: ~/
+            - run:
+                name: Package backend
+                command: |
+                  cd backend/dist
+                  cp ../package* .
+                  zip -rq dist.zip *
+                  mkdir -p ~/project/.circleci/ansible/roles/deploy-backend/files
+                  mv dist.zip ~/project/.circleci/ansible/roles/deploy-backend/files/
       # - destroy-environment   
       # - revert-migrations   
 
