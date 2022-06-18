@@ -1,7 +1,7 @@
 ---
 - name: "Creates backend app directory"
   file:
-    paths: /home/backend-app
+    path: ~/backend-app
     state: directory
 
 - name: "Copy compiled backend app"
