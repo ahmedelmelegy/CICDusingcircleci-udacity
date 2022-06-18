@@ -83,7 +83,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = $(curl --insecure https://kvdb.io/H8ASVQd4G2w8rPNeyR6YPb/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS = $(curl --insecure https://kvdb.io/59BucBx1Axx3wdVcqyb8o9/migration_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -290,7 +290,7 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-              curl https://kvdb.io/H8ASVQd4G2w8rPNeyR6YPb/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/59BucBx1Axx3wdVcqyb8o9/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
      # Here's where you will add some code to rollback on failure  
       # - destroy-environment   
@@ -357,27 +357,23 @@ jobs:
           command: |
             cd backend
             npm install
-      # - run:
-      #     name: Package backend
-      #     command: |
-      #       cd backend
-      #       npm run build
-      #       tar -czf artifact.tar.gz dist/* package*
-
-      #       cd ..
-      #       cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-
       - run:
-          name: Deploy backend
+          name: Package backend
           command: |
             cd backend
             npm i
             npm run build
+            tar -czf artifact.tar.gz  dist/* package*
+
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+
+      - run:
+          name: Deploy backend
+          command: |
             export TYPEORM_MIGRATIONS_DIR=/migrations
             export TYPEORM_ENTITIES=/modules/domain/**/*.entity.ts
             export TYPEORM_MIGRATIONS=/migrations/*.ts
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -vvv -i inventory.txt deploy-backend.yml
