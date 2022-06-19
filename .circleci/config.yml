@@ -346,7 +346,7 @@ jobs:
       - install_nodejs
       # - install_gzip
       - add_ssh_keys:
-          fingerprints: ["f7:af:9a:9f:aa:b0:ca:08:ad:9d:c6:6c:9a:b5:7a:16"]
+          fingerprints: ["77:23:77:2c:a8:fb:b0:26:eb:56:f4:b3:ac:0a:98:67"]
       - attach_workspace:
           at: ~/
       - restore_cache:
