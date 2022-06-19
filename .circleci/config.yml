@@ -51,7 +51,7 @@ commands:
           command: |   
             sudo apt-get update  
             sudo apt-get upgrade
-            curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -     
+            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -     
             sudo apt-get install -y nodejs
             sudo apt-get install gcc g++ make
 
