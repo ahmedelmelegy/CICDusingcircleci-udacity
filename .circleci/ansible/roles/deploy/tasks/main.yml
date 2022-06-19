@@ -7,11 +7,11 @@
 - name: "Unarchive backend files"
   unarchive:
     src: artifact.tar.gz
-    dest: backend-app
+    dest: /home/ubuntu/backend-app
 
 - name: "Installing node dependencies"
   shell: |
-    cd backend-app
+    cd /home/ubuntu/backend-app
     npm install --force
 
 - name: "Executing node"
