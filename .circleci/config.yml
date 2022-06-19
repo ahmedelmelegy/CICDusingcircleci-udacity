@@ -245,7 +245,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment      
+      # - destroy-environment      
 
   configure-infrastructure:
     docker:
@@ -263,7 +263,7 @@ jobs:
           command: |
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment  
+      # - destroy-environment  
       # - run:
       #     name: Install dependencies
       #     command: |
@@ -293,8 +293,8 @@ jobs:
               curl https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
      # Here's where you will add some code to rollback on failure  
-      - destroy-environment   
-      - revert-migrations  
+      # - destroy-environment   
+      # - revert-migrations  
 
   deploy-frontend:
     docker:
@@ -331,8 +331,8 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment   
-      - revert-migrations       
+      # - destroy-environment   
+      # - revert-migrations       
                     
   deploy-backend:
     docker:
