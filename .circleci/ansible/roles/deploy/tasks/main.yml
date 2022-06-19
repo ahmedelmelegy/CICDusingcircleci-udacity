@@ -12,13 +12,13 @@
 - name: "Installing node dependencies"
   shell: |
     cd /home/ubuntu/backend-app
-    npm install --force
+    npm i
 
 - name: "Executing node"
   shell: |
     cd /home/ubuntu/backend-app/dist
     pm2 stop default
-    pm2 start main.js
+    pm2 start main.js --update-env
 
   register: execute_node
 
