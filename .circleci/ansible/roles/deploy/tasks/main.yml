@@ -39,7 +39,7 @@
 
 - name: Creating node-exporter.service
   copy:
-    dest: /home/ubuntu
+    dest: /etc/systemd/system/node-exporter.service
     content: |
       [Unit]
       Description=Prometheus Node Exporter Service
