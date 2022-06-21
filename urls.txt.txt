@@ -1,8 +1,8 @@
 [URL01]:	https://github.com/ahmedelmelegy/cdond-c3-projectstarter
 
-[URL02]:	http://udapeople-c8d05e6.s3-website-us-east-1.amazonaws.com
+[URL02]:	http://udapeople-e87a19d.s3.amazonaws.com/index.html#/employees
 
-[URL03]:	http://d33q6w8q1fvmdi.cloudfront.net
+[URL03]:	http://d38itti9bgi8dj.cloudfront.net/#/employees
 
-[URL04]:	ec2-54-165-75-239.compute-1.amazonaws.com
+[URL04]:	http://ec2-54-163-86-32.compute-1.amazonaws.com:3030/api/status
 
